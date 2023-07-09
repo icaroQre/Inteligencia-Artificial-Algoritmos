@@ -1,5 +1,5 @@
 // Definindo grafo baseado no mapa
-grafo = {
+graph = {
     'Oradea': {'Zerind': 71, 'Sibiu': 151},
     'Zerind': {'Arad': 75, 'Oradea': 71},
     'Arad': {'Zerind': 75, 'Sibiu': 140, 'Timisoara': 118},
@@ -10,9 +10,9 @@ grafo = {
     'Craiova': {'Dobreta': 120, 'Rimnicu Vilcea': 146, 'Pitesti': 138},
     'Sibiu': {'Oradea': 151, 'Arad': 140, 'Fagaras': 99, 'Rimnicu Vilcea': 80},
     'Rimnicu Vilcea': {'Sibiu': 80, 'Craiova': 146, 'Pitesti': 97},
-    'Fagaras': {'Sibiu': 99, 'Bucharest': 211},
     'Pitesti': {'Rimnicu Vilcea': 97, 'Craiova': 138, 'Bucharest': 101},
     'Bucharest': {'Fagaras': 211, 'Pitesti': 101, 'Giurgiu': 90, 'Urziceni': 85},
+    'Fagaras': {'Sibiu': 99, 'Bucharest': 211},
     'Giurgiu': {'Bucharest': 90},
     'Urziceni': {'Bucharest': 85, 'Hirsova': 98, 'Vaslui': 142},
     'Hirsova': {'Urziceni': 98, 'Eforie': 86},
@@ -22,40 +22,64 @@ grafo = {
     'Neamt': {'Iasi': 87}
 }
 
-// Vértices que já tiveram todas as suas arestas verificadas 
-let visitados = [];
-// Pai de cada vértice
-let pai = [];
-// Distância de cada vértice
-let distancia = [];
-// Vértices que vão ser percorridos
-let fila = [];
+function djk (graph, source, destiny) {
+    
+    let visited = [] // Incia um vetor para armazenar os vértices que já foram visitados
+    let parent = [] // Inicia um vetor para armazenar os pais de cada vértice
+    let cost = [] // Inicia um vetor para armazenar a distância do ponto de partida até cada vértice
+    let queue = [] // Inicia uma fila para armazenar os nós a serem visitados
 
-console.log('Inicializando o algoritimo de Dijkstra \n')
+    for (var element in graph){
+        parent[element] = null
+        cost[element] = Infinity
+    }
+    
+    parent[source] = source // Marca o pai do nó inicial sendo ele mesmo
+    cost[source] = 0 // Adiciona a distância do vértice inicial no vetor de distâncias
+    
+    queue.push(source) // Inicia a fila dos nós para serem visitados
+    visited.push(source) // Adiciona o vértice de origem no vetor de visitados
+    
+    
+    // Enquanto a fila não estiver vazia
+    while (queue.length > 0) {
+    
+        var currentNode = queue.shift() // Pega o vértice atual da fila
+        visited.push(currentNode) // Adiciona o vértice atual no vetor de visitados
+        
+        // Verifica se o vértice atual é o destino
+        if (currentNode == destiny) {
 
-const dijkstra = (origem, objetivo) => {
+            var path = [] // Inicia um vetor para armazenar o nós do caminho até o destino
 
-    // Define por onde a verificação deve começar
-    fila[0] = origem;
-
-    while (borda) {
-
-        //Vértice que vai ser explorado neste momento
-        no = borda.pop(0);
-
-        //Verifica se o nó já foi visitado
-        if (visitados.includes(no) == false){
-            
-            // Verifica se o nó já chegou no objetivo
-            if (no == objetivo){
-                return;
+            // Enquanto o nó atual não for a origem
+            while (currentNode!= source) {
+                path.unshift(currentNode) // Adiciona o nó ao vetor de caminho
+                currentNode = parent[currentNode] // Define o nó atual sendo o pai do nó atual
             }
-            // Se não, visita ele
-            else{
-                visitados.push(no)
-            }
+            path.unshift(source) // Adiciona o vértice inicial no vetor de caminhos
+            return console.log("Custo minimo de " + source + ", até " + destiny + " é: " + cost[destiny] + "\nCaminho:\n" + path)
         }
 
-    }
+        // Para cada nó adjacente do nó atual
+        for (var adjNode in graph[currentNode]) {
+            
+            // Verifica se o nó adjacente ainda não foi visitado
+            if(!visited.includes(adjNode)){
 
+                // Se o custo por esse caminho for menor que o custo que está salvo, substitui o caminho
+                 if((cost[currentNode] + graph[currentNode][adjNode]) < cost[adjNode]){
+                    cost[adjNode] = cost[currentNode] + graph[currentNode][adjNode] // Define o custo sendo, o custo da origem até o pai (custo acumulado) + custo do pai até o nó adjacente 
+                    parent[adjNode] = currentNode // Define o nó atual como pai do vértice adjacente
+                }
+
+                queue.push(adjNode) // Adiciona o vértice adjacente no fila para ser explorado
+                queue.sort(function (a, b){ // Ordena a fila para que o menor custo seja o próxmo a ser explorado 
+                    return cost[a] - cost[b]
+                })
+            }
+        }
+    }
 }
+
+djk(graph, 'Oradea', 'Bucharest')

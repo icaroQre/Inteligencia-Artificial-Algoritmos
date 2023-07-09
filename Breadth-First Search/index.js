@@ -110,7 +110,7 @@ function bfs(graph, source, destiny){
             // Visita os nós adjacentes do nó atual
             graph.edges.get(node).forEach(element => {
                 
-                //Se o nó adjacente ainda não está no vetor de visitados
+                //Se o nó adjacente do nó atual ainda não está no vetor de visitados
                 if(!visited.includes(element)){
 
                     parent[element] = node // Marca o pai do nó adjacente sendo o nó atual
